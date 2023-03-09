@@ -1,4 +1,3 @@
 int main (void)
-{
-	print_hello ();
+{print_hello ();
 }
