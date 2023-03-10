@@ -1,5 +1,5 @@
-all: hello
-hello:	hello.c
-	gcc -Wall -Werror -o hello hello.c
+all: geo
+geo:	geometry.c
+	gcc -Wall -Werror -o geo geometry.c
 clean:
-	rm hello
+	rm geo
