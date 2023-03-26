@@ -132,18 +132,18 @@ int main()
     FILE* file;
     file = fopen("geometry.txt", "r");
     if(file == NULL){
-    printf("I AM NOT FOUND TXT FILE\n");
+        printf("I AM NOT FOUND TXT FILE\n");
     }
     else{
-    char str1[100];
-    int countObj = 0;
-    while (fgets(str1, 99, file)) {
-        countObj++;
-        strToLower(str1);
-        NameErorr(str1, countObj);
-        printf("%s\n", str1);
-    }
-    fclose(file);
-    return 0;
+        char str1[100];
+        int countObj = 0;
+        while (fgets(str1, 99, file)) {
+            countObj++;
+            strToLower(str1);
+            NameErorr(str1, countObj);
+            printf("%s\n", str1);
+        }
+        fclose(file);
+        return 0;
     }
 }
