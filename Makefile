@@ -45,7 +45,7 @@ $(OBJ_DIR)/%.o: %.c
 run:
 	./bin/geometry
 
-run_test:
+testing:
 	./bin/test
 
 clean:
