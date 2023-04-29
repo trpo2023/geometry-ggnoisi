@@ -1,4 +1,4 @@
-#include "/home/ggnoisi/b/testcheck.h"
+#include "/home/ggnoisi/b/src/libgeometry/check.h"
 #include "/home/ggnoisi/b/thirdparty/ctest.h"
 
 #include <stdio.h>

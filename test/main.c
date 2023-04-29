@@ -4,7 +4,7 @@
 
 #define CTEST_SEGFAULT
 
-#include "thirdparty/ctest.h"
+#include "/home/ggnoisi/b/thirdparty/ctest.h"
 
 int main(int argc, const char* argv[])
 {
