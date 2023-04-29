@@ -1,149 +1,192 @@
 #include <ctype.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
-#define ZERO 48
-#define NINE 57
-struct point {
-    double x;
-    double y;
-};
-typedef struct point point;
-
-struct triangle {
-    point apex1;
-    point apex2;
-    point apex3;
-    point checkApex;
-};
-typedef struct triangle triangle;
-
-struct circle {
-    point center;
-    double radius;
-};
-typedef struct circle circle;
-
-void strToLower(char* str)
-{
-    for (int i = 0; i < strlen(str); i++)
-        str[i] = tolower(str[i]);
-}
-
-int isArguments(char* str)
-{
-    int ret = 0;
-    int count = 0;
-    for (int i = 7; str[i] != ',' && i < strlen(str); i++) {
-        if ((str[i] != '.' && str[i] != ' ')
-            && !(str[i] >= ZERO && str[i] <= NINE)) {
-            printf("Object coordinates entered incorrectly\n");
-            ret++;
-            return 1;
-        }
-        if (str[i] >= ZERO && str[i] <= NINE && str[i + 1] == ' ')
-            count++;
-        if (str[i] == '.' && str[i + 1] == ')')
-            count += 2;
-    }
-    if (count + 1 != 2) {
-        printf("Object coordinates entered incorrectly\n");
-        ret++;
-        return ret;
-    }
-    int index = 0;
-    for (int i = 0; i != strlen(str); i++) {
-        if (str[i] == ',') {
-            index = i + 1;
-            i = strlen(str) - 1;
-        }
-    }
-    for (; str[index] != ')' && index < strlen(str); index++) {
-        if ((str[index] != '.' && str[index] != ' ')
-            && !(str[index] >= ZERO && str[index] <= NINE)) {
-            printf("Object radius entered incorrectly\n");
-            ret++;
-            return 1;
-        }
-        if (str[index] >= ZERO && str[index] <= NINE && str[index + 1] == ' ')
-            count++;
-        if (str[index] == '.' && str[index + 1] == ' ')
-            count += 2;
-    }
-    if (count != 1) {
-        printf("Object radius entered incorrectly\n");
-        ret++;
-    }
-    return ret;
-}
-
-int isLast(char* str)
-{
-    int ret = 1;
-    int firstBracket = 0;
-    long int endingSymbol;
-    if (str[strlen(str) - 1] == '\n')
-        endingSymbol = strlen(str) - 2;
-    else
-        endingSymbol = strlen(str) - 1;
-    for (int i = 0; i < strlen(str); i++) {
-        if (str[i] == ')') {
-            firstBracket = i;
+int check_word(char a[], int* error) {
+    char b[6] = "circle";
+    int open_bracket_index;
+    for (int i = 0; i < 7; i++) {
+        if (a[i] != b[i] && i < 6) {
+            open_bracket_index = 0;
+            printf("\nError at column %d: expected 'circle'", i);
+            *error = 1;
             break;
         }
+        open_bracket_index = i;
     }
-    if (firstBracket == endingSymbol)
-        ret = 0;
-    return ret;
+    return open_bracket_index;
 }
 
-int isObject(char* str)
-{
-    int ret = 1;
-    char rec[100];
-    for (int i = 0; i < strlen(str); i++) {
-        if (str[i] != '(')
-            rec[i] = str[i];
-        else
+int search_close_bracket_index(char a[], int length) {
+    int close_bracket_index;
+    for (int i = 0; i < length; i++) {
+        if (a[i] == ')') {
+            close_bracket_index = i;
+        } else {
+            close_bracket_index = length - 1;
+        }
+    }
+    return close_bracket_index;
+}
+
+int check_first_number(char a[], int open_bracket_index, int* error) {
+    int first_num_elem_index = 0;
+    for (int i = open_bracket_index + 1; a[i] != ' '; i++) {
+        if (*error == 0) {
+            if (a[i] == ',') {
+                printf("\nError at column %d: expected '<space>' and "
+                       "'<double>'",
+                       i);
+                break;
+            }
+            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-') {
+                printf("\nError at column %d: expected '<double>'", i);
+                *error = 1;
+                break;
+            }
+            first_num_elem_index = i;
+        } else
             break;
     }
-    char figure[] = "circle";
-    if (strcmp(rec, figure) == 0) {
-        ret = 0;
-    }
-    return ret;
+    return first_num_elem_index;
 }
 
-int NameErorr(char* str, int countObj)
-{
-    printf("Object  %d:\n", countObj);
-    if (isObject(str)) {
-        printf("Incorrect input of object name\n");
-    } else if (isArguments(str)) {
-        return 0;
-    } else if (isLast(str)) {
-        printf("Wrong terminator\n");
+int check_second_number(char a[], int first_num_elem_index, int* error) {
+    int second_num_elem_index = 0;
+    for (int i = first_num_elem_index + 2; a[i] != ','; i++) {
+        if (*error == 0) {
+            if (a[i] == ')') {
+                printf("\nError at column %d: expected ',' and '<double>'", i);
+                *error = 1;
+                break;
+            }
+            if (isdigit(a[i]) == 0 && a[i] != '.' && a[i] != '-') {
+                printf("\nError at column %d: expected '<double>' or ',' "
+                       "token",
+                       i);
+                *error = 1;
+                break;
+            }
+            second_num_elem_index = i;
+        } else
+            break;
+    }
+    return second_num_elem_index;
+}
+
+int check_third_number(
+        char a[], int second_num_elem_index, int close_bracket_index,
+        int* error) {
+    int third_num_elem_index = 0;
+    for (int i = second_num_elem_index + 3; i < close_bracket_index; i++) {
+        if (*error == 0) {
+            if ((isdigit(a[i]) == 0 && a[i] != '.') || a[i] == '0') {
+                if (a[i] == ')' || a[i] == '(' || a[i] == ' ') {
+                    break;
+                }
+                printf("\nError at column %d: expected '<double>'", i);
+                *error = 1;
+                break;
+            }
+            third_num_elem_index = i;
+        } else
+            break;
+    }
+    return third_num_elem_index;
+}
+
+int check_close_bracket_index(
+        char a[], int third_num_elem_index, int length, int* error) {
+    int close_bracket_index = 0;
+    for (int i = third_num_elem_index + 1; i < length; i++) {
+        if (*error == 0) {
+            if (a[i] != ')') {
+                printf("\nError at column %d: expected ')'", i);
+                *error = 1;
+                break;
+            } else {
+                close_bracket_index = i;
+                break;
+            }
+        } else
+            break;
+    }
+    return close_bracket_index;
+}
+
+void check_unexpected_tokens(
+        char a[], int close_bracket_index, int length, int* error) {
+    for (int i = close_bracket_index + 1; i < length; i++) {
+        if (*error == 0) {
+            if (a[i] == '\n') {
+                break;
+            }
+
+            if (a[i] != ' ') {
+                printf("\nError at column %d: unexpected token", i);
+                *error = 1;
+                break;
+            }
+        } else
+            break;
+    }
+}
+
+int main() {
+    FILE* file1;
+    FILE* file;
+
+    file1 = fopen("geometry.txt", "r");
+
+    if (!file1) {
+        printf("\nError: cannot open file. Check file's name");
+    }
+
+    int open_bracket_index = 0, close_bracket_index = 0,
+        first_num_elem_index = 0, second_num_elem_index = 0,
+        third_num_elem_index = 0, error;
+    int length = 0, count = 0, element = 0;
+    puts("\n");
+    while (1) {
+        element = fgetc(file1);
+        if (element == EOF) {
+            if (feof(file1) != 0) {
+                break;
+            }
+        }
+        count++;
+    }
+    length = count;
+    fclose(file1);
+
+    char a[length];
+    file = fopen("geometry.txt", "r");
+    while (fgets(a, length + 1, file)) {
+        printf("%s", a);
+        error = 0;
+
+        open_bracket_index = check_word(a, &error);
+
+        close_bracket_index = search_close_bracket_index(a, length);
+
+        first_num_elem_index
+                = check_first_number(a, open_bracket_index, &error);
+
+        second_num_elem_index
+                = check_second_number(a, first_num_elem_index, &error);
+
+        third_num_elem_index = check_third_number(
+                a, second_num_elem_index, close_bracket_index, &error);
+
+        close_bracket_index = check_close_bracket_index(
+                a, third_num_elem_index, length, &error);
+
+        check_unexpected_tokens(a, close_bracket_index, length, &error);
+
+        if (error == 0)
+            printf("\nNo Errors!");
+        puts("\n\n");
     }
     return 0;
-}
-
-int main()
-{
-    FILE* file;
-    file = fopen("geometry.txt", "r");
-    if(file == NULL){
-        printf("I AM NOT FOUND TXT FILE\n");
-    }
-    else{
-        char str1[100];
-        int countObj = 0;
-        while (fgets(str1, 99, file)) {
-            countObj++;
-            strToLower(str1);
-            NameErorr(str1, countObj);
-            printf("%s\n", str1);
-        }
-        fclose(file);
-        return 0;
-    }
 }

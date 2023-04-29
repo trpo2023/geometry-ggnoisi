@@ -1,5 +1,10 @@
-all: geo
-geo:	geometry.c
-	gcc -Wall -Werror -o geo geometry.c
+geometry.exe: geometry.c
+	gcc -Wall -Werror -o geometry.exe geometry.c
+
 clean:
-	rm geo
+
+	rm geometry.exe
+
+run:
+
+	./geometry.exe
