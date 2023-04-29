@@ -1,3 +1,4 @@
 circle(4 2, 8)
-circle(5.4 1.75, 315)
-circle(5 q, 4)
+circle(2 2, 8)
+circle(8 2, 2)
+circle(2 2, 21)
