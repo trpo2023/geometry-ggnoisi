@@ -40,7 +40,7 @@ $(LIB_PATH): $(LIB_OBJECTS)
 $(OBJ_DIR)/%.o: %.c
 	$(CC) -c $(CFLAGS) $< -o $@ 
 
-.PHONY: run clean test run_test
+.PHONY: run clean test testing 
 
 run:
 	./bin/geometry
